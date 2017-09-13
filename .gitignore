@@ -35,3 +35,4 @@ sysinfo.txt
 
 # PSDs and other local work files
 *.psd
+*.psd.meta
