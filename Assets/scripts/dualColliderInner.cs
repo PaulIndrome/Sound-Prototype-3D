@@ -11,19 +11,14 @@ public class dualRangeColliders : MonoBehaviour {
 	void Start () {
         parent = GetComponentInParent<dualRangeParent>();
         thisCol = GetComponent<BoxCollider>();
-        parent.setInnerRange(thisCol);
+        parent.SetInnerRange(thisCol);
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     void OnTriggerEnter(Collider other)
     {
         if(other.tag == "Player")
         {
-            parent.innerRangeEntered();
+            parent.InnerRangeEntered();
         }
     }
 
@@ -31,7 +26,7 @@ public class dualRangeColliders : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            parent.innerRangeExited();
+            parent.InnerRangeExited();
         }
     }
 }

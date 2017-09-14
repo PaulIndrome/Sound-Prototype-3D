@@ -24,6 +24,7 @@ public class dualRangeParent : MonoBehaviour {
     float innerRangePosX;
 
 	void Start () {
+        player = GameObject.FindGameObjectWithTag("Player");
         audioS = GetComponent<AudioSource>();
         audioS.volume = 0;
         outerRange = GetComponent<BoxCollider>();
@@ -37,11 +38,10 @@ public class dualRangeParent : MonoBehaviour {
                 audioS.volume = maxVolume;
             } else
             {
+                
                 if(player.transform.position.x > innerRangePosX) //if player right of inner, interpolate right inner end to right outer end
                 {
-                    currentDistance = Mathf.Sqrt(Mathf.Pow((transform.position.x - player.transform.position.x), 2) + (Mathf.Pow((transform.position.y - player.transform.position.y), 2)) * yInfluence);
-                    currentVolume = maxVolume * proximCurve.Evaluate(currentDistance / Mathf.Sqrt(Mathf.Pow((maxDistanceX), 2) + (Mathf.Pow((maxDistanceY), 2)) * yInfluence));
-                    audioS.volume = currentVolume;
+                    
                 }
                 
             }
@@ -50,11 +50,16 @@ public class dualRangeParent : MonoBehaviour {
         }
 	}
 
+    /*
+     * currentDistance = Mathf.Sqrt(Mathf.Pow((transform.position.x - player.transform.position.x), 2) + (Mathf.Pow((transform.position.y - player.transform.position.y), 2)) * yInfluence);
+                    currentVolume = maxVolume * proximCurve.Evaluate(currentDistance / Mathf.Sqrt(Mathf.Pow((maxDistanceX), 2) + (Mathf.Pow((maxDistanceY), 2)) * yInfluence));
+                    audioS.volume = currentVolume;
+     */
+
     void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
         {
-            player = other.gameObject;
             audioS.Play();
         }
     }
@@ -63,24 +68,23 @@ public class dualRangeParent : MonoBehaviour {
     {
         if (player)
         {
-            player = null;
             audioS.Pause();
             audioS.volume = 0;
         }
     }
 
 
-    public void innerRangeEntered()
+    public void InnerRangeEntered()
     {
         withinInnerRange = true;
     }
 
-    public void innerRangeExited()
+    public void InnerRangeExited()
     {
         withinInnerRange = false;
     }
 
-    public void setInnerRange(BoxCollider innerRangeCol)
+    public void SetInnerRange(BoxCollider innerRangeCol)
     {
         innerRange = innerRangeCol;
         innerRangeSizeX = innerRange.size.x;

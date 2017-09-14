@@ -15,7 +15,7 @@ public class proximity2DMusic : MonoBehaviour {
     public AudioSource audioS;
     public AnimationCurve proximCurve;
     private GameObject player;
-    private BoxCollider boxCol;
+    public BoxCollider boxCol;
 
 
 	void Start () {

@@ -19,16 +19,46 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4841373932226006}
+  - component: {fileID: 65573794741912966}
   - component: {fileID: 82654167381649284}
-  - component: {fileID: 114129598823746798}
-  - component: {fileID: 65197876555697456}
+  - component: {fileID: 114043821301973436}
   m_Layer: 0
-  m_Name: proximityMusicZone 1
+  m_Name: dualColliderProximity
   m_TagString: Untagged
   m_Icon: {fileID: -6488666005112524639, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1541224788242414
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4082003072430852}
+  - component: {fileID: 65576050425435168}
+  - component: {fileID: 114670049321089298}
+  m_Layer: 0
+  m_Name: innerRange
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4082003072430852
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1541224788242414}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4841373932226006}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4841373932226006
 Transform:
   m_ObjectHideFlags: 1
@@ -36,13 +66,14 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1213380656058282}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -6.0635357, y: 13.947554, z: -19.854383}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4082003072430852}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &65197876555697456
+--- !u!65 &65573794741912966
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -52,7 +83,19 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 7.36, y: 2.2479458, z: 1}
+  m_Center: {x: 0.018720627, y: 0.6239729, z: 0}
+--- !u!65 &65576050425435168
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1541224788242414}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4.4, y: 2.69, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!82 &82654167381649284
 AudioSource:
@@ -74,8 +117,8 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
+  MinDistance: 0
+  MaxDistance: 0.01
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -135,7 +178,8 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
---- !u!114 &114129598823746798
+  m_ExtensionPropertyValues: []
+--- !u!114 &114043821301973436
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -143,28 +187,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 1213380656058282}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e6663ec4ddc5a642a3e5f6df3566f07, type: 3}
+  m_Script: {fileID: 11500000, guid: 3abbcf1f59a0604499d99c1ca2ad45d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxVolume: 0.5
+  maxVolume: 0
   yInfluence: 0
   LMRBias: 0
   audioS: {fileID: 0}
   proximCurve:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 2
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 1
-      value: -0.0020256042
-      inSlope: -0.000021225733
-      outSlope: -0.000021225733
-      tangentMode: 0
+    m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
+--- !u!114 &114670049321089298
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1541224788242414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6df420124de64ef4ca0c68be12ae6033, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
