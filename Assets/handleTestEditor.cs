@@ -7,29 +7,35 @@ using UnityEditor;
 public class handleTestEditor : Editor {
 
     //for a lack of "null" instantiation, do with unlikely to reach maxValues
-    Vector2 lastPos = new Vector2(float.MaxValue, float.MaxValue);
+    Vector2 lastPos;// = new Vector2(float.MaxValue, float.MaxValue);
     handleTest targ;
+
+    public Rect outerRect;
+    public Rect innerRect;
 
     void OnSceneGUI()
     {
         targ = (handleTest)target; //get target
 
+        outerRect = targ.outerRect;
+        innerRect = targ.innerRect;
+
         handleTest targetCopy = targ;
 
         EditorGUI.BeginChangeCheck();
         //instantiate at parent's position
-        if (lastPos == new Vector2(float.MaxValue, float.MaxValue))
+        /*if (lastPos == new Vector2(float.MaxValue, float.MaxValue))
         {
             lastPos = targ.transform.position;
-        }
+        }*/
 
 
-        if(Mathf.Abs(targ.innerRangeUp - targ.innerRangeDown) <= 0.25f || Mathf.Abs(targ.innerRangeRight - targ.innerRangeLeft) <= 0.25f)
+        if(Mathf.Abs(targ.innerRect.yMax - targ.innerRect.yMin) <= 0.25f || Mathf.Abs(targ.innerRect.xMax - targ.innerRect.xMin) <= 0.25f)
         {
-            targ.innerRangeDown -= 0.25f;
-            targ.innerRangeUp += 0.25f;
-            targ.innerRangeRight += 0.25f;
-            targ.innerRangeLeft -= 0.25f;
+            targ.innerRect.yMin -= 0.25f;
+            targ.innerRect.yMax += 0.25f;
+            targ.innerRect.xMax += 0.25f;
+            targ.innerRect.xMin -= 0.25f;
         }
         
 
@@ -40,15 +46,15 @@ public class handleTestEditor : Editor {
             /*
              * update ranges with difference vector's x and y values
              */
-            targ.outerRangeLeft += diff.x;
-            targ.outerRangeRight += diff.x;
-            targ.outerRangeDown += diff.y;
-            targ.outerRangeUp += diff.y;
+            targ.outerRect.xMin += diff.x;
+            targ.outerRect.xMax += diff.x;
+            targ.outerRect.yMin += diff.y;
+            targ.outerRect.yMax += diff.y;
 
-            targ.innerRangeLeft += diff.x;
-            targ.innerRangeRight += diff.x;
-            targ.innerRangeDown += diff.y;
-            targ.innerRangeUp += diff.y;
+            targ.innerRect.xMin += diff.x;
+            targ.innerRect.xMax += diff.x;
+            targ.innerRect.yMin += diff.y;
+            targ.innerRect.yMax += diff.y;
 
             targ.transform.hasChanged = false;
 
@@ -72,145 +78,171 @@ public class handleTestEditor : Editor {
     void handleInnerRanges()
     {
         //create rectangle according to the updated ranges
-        Rect innerRect = Rect.MinMaxRect(targ.innerRangeLeft, targ.innerRangeDown, targ.innerRangeRight, targ.innerRangeUp);
+        //Rect targ.innerRect = Rect.MinMaxRect(targ.innerRect.xMin, targ.innerRect.yMin, targ.innerRect.xMax, targ.innerRect.yMax);
 
         //use the rectangle's Min and Max range to generate the SolidRectangle ... just for that, damn.
         Vector3[] rectVerts = new Vector3[4]
        {
-            new Vector3(innerRect.xMax, innerRect.yMax, 0),
-            new Vector3(innerRect.xMin, innerRect.yMax, 0),
-            new Vector3(innerRect.xMin, innerRect.yMin, 0),
-            new Vector3(innerRect.xMax, innerRect.yMin, 0)
+            new Vector3(targ.innerRect.xMax, targ.innerRect.yMax, 0),
+            new Vector3(targ.innerRect.xMin, targ.innerRect.yMax, 0),
+            new Vector3(targ.innerRect.xMin, targ.innerRect.yMin, 0),
+            new Vector3(targ.innerRect.xMax, targ.innerRect.yMin, 0)
        };
 
         Handles.DrawSolidRectangleWithOutline(rectVerts, new Color(1, 1, 0, 0.05f), Color.yellow);
-
+        
         //draw the Handles for the ranges according to the rectangles Min and Max values
         Handles.color = Color.green;
-        targ.innerRangeUp = Handles.FreeMoveHandle(new Vector3((innerRect.xMax + innerRect.xMin) / 2, innerRect.yMax, 0),
+        targ.innerRect.yMax = Handles.FreeMoveHandle(new Vector3((targ.innerRect.xMax + targ.innerRect.xMin) / 2, targ.innerRect.yMax, 0),
                 Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).y;
         Handles.color = Color.red;
-        targ.innerRangeLeft = Handles.FreeMoveHandle(new Vector3(innerRect.xMin, (innerRect.yMax + innerRect.yMin) / 2, 0),
+        targ.innerRect.xMin = Handles.FreeMoveHandle(new Vector3(targ.innerRect.xMin, (targ.innerRect.yMax + targ.innerRect.yMin) / 2, 0),
                 Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).x;
         Handles.color = Color.green;
-        targ.innerRangeDown = Handles.FreeMoveHandle(new Vector3((innerRect.xMax + innerRect.xMin) / 2, innerRect.yMin, 0),
+        targ.innerRect.yMin = Handles.FreeMoveHandle(new Vector3((targ.innerRect.xMax + targ.innerRect.xMin) / 2, targ.innerRect.yMin, 0),
                 Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).y;
         Handles.color = Color.red;
-        targ.innerRangeRight = Handles.FreeMoveHandle(new Vector3(innerRect.xMax, (innerRect.yMax + innerRect.yMin) / 2, 0),
+        targ.innerRect.xMax = Handles.FreeMoveHandle(new Vector3(targ.innerRect.xMax, (targ.innerRect.yMax + targ.innerRect.yMin) / 2, 0),
                 Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).x;
 
         // what happens if the ranges conflict?
         /*
-         * it occurs that pushing a range into the opposing range moves the entire rectangle
-         */
-        if (targ.innerRangeDown > targ.innerRangeUp)
+            * it occurs that pushing a range into the opposing range moves the entire rectangle
+            */
+        if (targ.innerRect.yMin > targ.innerRect.yMax)
         {
-            float temp = targ.innerRangeDown;
-            targ.innerRangeDown = targ.innerRangeUp;
-            targ.innerRangeUp = temp;
+            float temp = targ.innerRect.yMin;
+            targ.innerRect.yMin = targ.innerRect.yMax;
+            targ.innerRect.yMax = temp;
         }
-        if (targ.innerRangeLeft > targ.innerRangeRight)
+        if (targ.innerRect.xMin > targ.innerRect.xMax)
         {
-            float temp = targ.innerRangeLeft;
-            targ.innerRangeLeft = targ.innerRangeRight;
-            targ.innerRangeRight = temp;
+            float temp = targ.innerRect.xMin;
+            targ.innerRect.xMin = targ.innerRect.xMax;
+            targ.innerRect.xMax = temp;
         }
 
-        Handles.color = Color.blue;
+        if (targ.innerRect.yMin < targ.outerRect.yMin)
+        {
+            targ.innerRect.yMin = targ.outerRect.yMin;
+        }
+        if (targ.innerRect.xMin < targ.outerRect.xMin)
+        {
+            targ.innerRect.xMin = targ.outerRect.xMin;
+        }
+        if (targ.innerRect.yMax > targ.outerRect.yMax)
+        {
+            targ.innerRect.yMax = targ.outerRect.yMax;
+        }
+        if (targ.innerRect.xMax > targ.outerRect.xMax)
+        {
+            targ.innerRect.xMax = targ.outerRect.xMax;
+        }
+
+
+        Handles.color = Color.magenta;
 
         /*
          * Following is the code that enables the center handle to move all ranges and thus the entire rectangle
          */
         EditorGUI.BeginChangeCheck();
         //rectangle was here
-        Vector2 prevCenter = innerRect.center;
+        Vector2 prevCenter = targ.innerRect.center;
         //rectangle will be here
-        Vector2 afterCenter = Handles.FreeMoveHandle(prevCenter, Quaternion.identity, 1f, new Vector3(0.5f, 0.5f, 0.5f), Handles.RectangleHandleCap);
+        Vector2 afterCenter = Handles.FreeMoveHandle((Vector3)prevCenter, Quaternion.identity, 0.75f, new Vector3(0.5f, 0.5f, 0.5f), Handles.CircleHandleCap);
         if (EditorGUI.EndChangeCheck())
         {
             // get difference of rectangles position and change the RANGES by the difference's x and y values, not the rectangle!
             Vector2 centerDiff = afterCenter - prevCenter;
-            targ.innerRangeLeft += centerDiff.x;
-            targ.innerRangeRight += centerDiff.x;
-            targ.innerRangeDown += centerDiff.y;
-            targ.innerRangeUp += centerDiff.y;
+            if (targ.innerRect.xMin + centerDiff.x >= targ.outerRect.xMin && targ.innerRect.xMax + centerDiff.x <= targ.outerRect.xMax)
+            {
+                targ.innerRect.xMin += centerDiff.x;
+                targ.innerRect.xMax += centerDiff.x;
+            } else
+            {
+                centerDiff.x = (targ.innerRect.xMin + centerDiff.x < targ.outerRect.xMin) ? 
+                        targ.outerRect.xMin - targ.innerRect.xMin :
+                        targ.outerRect.xMax - targ.innerRect.xMax;
+                targ.innerRect.xMin += centerDiff.x;
+                targ.innerRect.xMax += centerDiff.x;
+            }
+            if (targ.innerRect.yMin + centerDiff.y >= targ.outerRect.yMin && targ.innerRect.yMax + centerDiff.y <= targ.outerRect.yMax)
+            {
+                targ.innerRect.yMin += centerDiff.y;
+                targ.innerRect.yMax += centerDiff.y;
+            }
+            else
+            {
+                centerDiff.y = (targ.innerRect.yMin + centerDiff.y < targ.outerRect.yMin) ?
+                        targ.outerRect.yMin - targ.innerRect.yMin :
+                        targ.outerRect.yMax - targ.innerRect.yMax;
+                targ.innerRect.yMin += centerDiff.y;
+                targ.innerRect.yMax += centerDiff.y;
+            }
+
         }
 
-        targ.innerRectPos = innerRect.position;
-        targ.innerRectSize = innerRect.size;
+        //targ.targ.innerRectPos = targ.innerRect.position;
+        //targ.targ.innerRectSize = targ.innerRect.size;
 
     }
 
     void handleOuterRanges()
     {
-        /*EditorGUI.BeginChangeCheck();
-        Vector2 prevPos = targ.transform.position;
-        Vector2 posDiff = new Vector2((targ.outerRangeRight - targ.outerRangeLeft), (targ.outerRangeUp - targ.outerRangeDown)) - prevPos;
-        if (EditorGUI.EndChangeCheck())
-        {
-            
-            Vector2 newPos = prevPos + posDiff;
-            targ.transform.position = newPos;
-        }*/
-        
         //create outer rectangle according to the updated ranges
-        Rect outerRect = Rect.MinMaxRect(targ.outerRangeLeft, targ.outerRangeDown, targ.outerRangeRight, targ.outerRangeUp);
+        //Rect targ.outerRect = Rect.MinMaxRect(targ.outerRect.xMin, targ.outerRect.yMin, targ.outerRect.xMax, targ.outerRect.yMax);
 
         //use the rectangle's Min and Max range to generate the SolidRectangle ... just for that, damn.
         Vector3[] rectVerts = new Vector3[4]
        {
-            new Vector3(outerRect.xMax, outerRect.yMax, 0.1f),
-            new Vector3(outerRect.xMin, outerRect.yMax, 0.1f),
-            new Vector3(outerRect.xMin, outerRect.yMin, 0.1f),
-            new Vector3(outerRect.xMax, outerRect.yMin, 0.1f)
+            new Vector3(targ.outerRect.xMax, targ.outerRect.yMax, 0.1f),
+            new Vector3(targ.outerRect.xMin, targ.outerRect.yMax, 0.1f),
+            new Vector3(targ.outerRect.xMin, targ.outerRect.yMin, 0.1f),
+            new Vector3(targ.outerRect.xMax, targ.outerRect.yMin, 0.1f)
        };
 
-        Handles.DrawSolidRectangleWithOutline(rectVerts, new Color(1, 0, 1, 0.05f), Color.magenta);
+        Handles.color = Color.blue;
+        Handles.DrawSolidRectangleWithOutline(rectVerts, new Color(0, 0, 1, 0.05f), Color.blue);
 
+        EditorGUI.BeginChangeCheck();
         //draw the Handles for the ranges according to the rectangles Min and Max values
-        Handles.color = Color.green;
-        targ.outerRangeUp = Handles.FreeMoveHandle(new Vector3((outerRect.xMax + outerRect.xMin) / 2, outerRect.yMax, 0),
-                Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).y;
         Handles.color = Color.red;
-        targ.outerRangeLeft = Handles.FreeMoveHandle(new Vector3(outerRect.xMin, (outerRect.yMax + outerRect.yMin) / 2, 0),
-                Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).x;
-        Handles.color = Color.green;
-        targ.outerRangeDown = Handles.FreeMoveHandle(new Vector3((outerRect.xMax + outerRect.xMin) / 2, outerRect.yMin, 0),
+        targ.outerRect.yMax = Handles.FreeMoveHandle(new Vector3((targ.outerRect.xMax + targ.outerRect.xMin) / 2, targ.outerRect.yMax, 0),
                 Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).y;
-        Handles.color = Color.red;
-        targ.outerRangeRight = Handles.FreeMoveHandle(new Vector3(outerRect.xMax, (outerRect.yMax + outerRect.yMin) / 2, 0),
+        Handles.color = Color.green;
+        targ.outerRect.xMin = Handles.FreeMoveHandle(new Vector3(targ.outerRect.xMin, (targ.outerRect.yMax + targ.outerRect.yMin) / 2, 0),
                 Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).x;
+        Handles.color = Color.red;
+        targ.outerRect.yMin = Handles.FreeMoveHandle(new Vector3((targ.outerRect.xMax + targ.outerRect.xMin) / 2, targ.outerRect.yMin, 0),
+                Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).y;
+        Handles.color = Color.green;
+        targ.outerRect.xMax = Handles.FreeMoveHandle(new Vector3(targ.outerRect.xMax, (targ.outerRect.yMax + targ.outerRect.yMin) / 2, 0),
+                Quaternion.identity, .75f, new Vector3(.5f, .5f, .5f), Handles.RectangleHandleCap).x;
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            targ.transform.position = new Vector3((targ.outerRect.xMin + targ.outerRect.xMax) * 0.5f, (targ.outerRect.yMax + targ.outerRect.yMin) * 0.5f, targ.transform.position.z);
+            lastPos = targ.transform.position;
+        }
 
         // what happens if the ranges conflict?
         /*
          * it occurs that pushing a range into the opposing range moves the entire rectangle
          */
-        if (targ.outerRangeDown > targ.innerRangeDown)
+
+        if (targ.outerRect.yMin > targ.outerRect.yMax)
         {
-            float temp = targ.outerRangeDown;
-            targ.outerRangeDown = targ.innerRangeDown;
-            targ.innerRangeDown = temp;
+            float temp = targ.outerRect.yMin;
+            targ.outerRect.yMin = targ.outerRect.yMax;
+            targ.outerRect.yMax = temp;
         }
-        if (targ.outerRangeUp < targ.innerRangeUp)
+        if (targ.outerRect.xMin > targ.outerRect.xMax)
         {
-            float temp = targ.outerRangeUp;
-            targ.outerRangeUp = targ.innerRangeUp;
-            targ.innerRangeUp = temp;
-        }
-        if (targ.outerRangeLeft > targ.innerRangeLeft)
-        {
-            float temp = targ.outerRangeLeft;
-            targ.outerRangeLeft = targ.innerRangeLeft;
-            targ.innerRangeLeft = temp;
-        }
-        if (targ.outerRangeRight < targ.innerRangeRight)
-        {
-            float temp = targ.outerRangeRight;
-            targ.outerRangeRight = targ.innerRangeRight;
-            targ.innerRangeRight = temp;
+            float temp = targ.outerRect.xMin;
+            targ.outerRect.xMin = targ.outerRect.xMax;
+            targ.outerRect.xMax = temp;
         }
 
-       
 
 
 
